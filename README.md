@@ -34,7 +34,7 @@ $ ./build/example/example
 
 ## Installation and usage
 
-Lawing can be easily added to your project through [CPM.make](https://github.com/TheLartians/CPM.cmake).
+Lapwing can be easily added to your project through [CPM.make](https://github.com/TheLartians/CPM.cmake).
 
 ```cmake
 CPMAddPackage(
