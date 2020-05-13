@@ -26,9 +26,10 @@ class OFdBuf: public std::streambuf {
         virtual ~OFdBuf();
     
         void open(int fd, size_t bufsize = 1);
-    private: 
+    private:
         virtual int sync();
         virtual int overflow(int c);
+        void cleanup();
 };
 
 // The default contstructor merely initializes the buffer to 0.
@@ -42,9 +43,14 @@ inline OFdBuf::OFdBuf(int fd, size_t bufsize) {
     open(fd, bufsize);
 }
 
-// Destructor, calls sync to flush any characters in the output buffer if the
-// implementation is using a buffer.
+// Destructor, calls cleanup.
 inline OFdBuf::~OFdBuf() {
+    cleanup();
+}
+
+// Cleanup calls sync to flush any characters in the output buffer if the
+// implementation is using a buffer.
+inline void OFdBuf::cleanup() {
     if (d_buffer) {
         sync();
         delete[] d_buffer;
@@ -57,6 +63,7 @@ inline void OFdBuf::open(int fd, size_t bufsize) {
     d_fd = fd;
     d_bufsize = bufsize == 0 ? 1 : bufsize;
 
+    cleanup();
     d_buffer = new char[d_bufsize];
     setp(d_buffer, d_buffer + d_bufsize);
 }
