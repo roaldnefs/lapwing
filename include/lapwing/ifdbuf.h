@@ -3,6 +3,7 @@
 
 #include <streambuf>
 #include <unistd.h>
+#include <cstring>
 
 namespace lapwing {
 
@@ -14,11 +15,11 @@ namespace lapwing {
 //    fds.sgetn(buf, 80);  // reads block of 80 chars
 class IFdBuf: public std::streambuf {
     // Holds the buffer size.
-    size_t d_bufsize;
+    size_t d_bufsize = 0;
     // Holds the file descriptor.
-    int d_fd;
+    int d_fd = -1;
     // Holds the buffer itself.
-    char *d_buffer;
+    char *d_buffer = 0;
 
     public:
         IFdBuf();
@@ -35,8 +36,7 @@ class IFdBuf: public std::streambuf {
 
 // The default contstructor merely initializes the buffer to 0.
 inline IFdBuf::IFdBuf()
-    : d_bufsize(0),
-      d_fd(0) {}
+{}
 
 // Constructor parsing the file descriptions and buffer size to the open member
 // function.
@@ -62,11 +62,12 @@ inline void IFdBuf::cleanup() {
 // Open initializes the buffer. After allocating the buffer streambuf::setg is
 // called.
 inline void IFdBuf::open(int fd, size_t bufsize) {
+    cleanup();
+    
     d_fd = fd;
     d_bufsize = bufsize;
-
-    cleanup();
     d_buffer = new char[d_bufsize];
+
     setg(d_buffer, d_buffer + d_bufsize, d_buffer + d_bufsize);
 }
 
